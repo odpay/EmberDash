@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 ## config
 WIDTH = 800
@@ -19,24 +20,29 @@ SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 CLOCK = pygame.time.Clock()
 
 ## Classes
-class Player:
+class Player(pygame.sprite.Sprite):
     def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
         self.x = WIDTH/2
         self.xVel = 0.0
         self.y = HEIGHT/2
         self.yVel = 0.0
-        self.speed = 2.5
+        self.speed = 1.5
         self.width = 25
         self.height = 25
         self.colour = WHITE
     
+        self.image = pygame.Surface((self.width, self.height))
+        self.image.fill(self.colour)
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x, self.y)
 
-    def draw(self):
-        self.tick()
-        pygame.draw.rect(SCREEN, self.colour, self.Rect())
-
-    def Rect(self):
-        return pygame.Rect(self.x, self.y, self.width, self.height)
+    def update(self): # TODO: slow down diagonal movements, use sqrt
+        self.x += self.xVel
+        self.xVel = 0
+        self.y += self.yVel
+        self.yVel = 0
+        self.rect.center = (round(self.x), round(self.y))
 
     def up(self):
         self.yVel -= self.speed
@@ -53,16 +59,9 @@ class Player:
 
 
 
-
-    def tick(self):
-        self.x += self.xVel
-        self.xVel = 0
-        self.y += self.yVel
-        self.yVel = 0
-
-
 class Projectile(pygame.sprite.Sprite):
-    def __init__(self, x, xVel, y, yVel):
+    def __init__(self, x, y, xVel, yVel):
+        pygame.sprite.Sprite.__init__(self)
         self.x = x
         self.xVel = xVel
         self.y = y
@@ -71,36 +70,41 @@ class Projectile(pygame.sprite.Sprite):
         self.width = 8
         self.height = 8
         self.colour = RED
-    
-    def tick(self):
+        self.image = pygame.Surface((self.width, self.height))
+        self.image.fill(self.colour)
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x, self.y)
+        self.outTime = 0
+
+    def update(self):
         self.x += self.xVel
         self.y += self.yVel
-    
-    def Rect(self):
-        return pygame.Rect(self.x, self.y, self.width, self.height)
-    
-    def draw(self):
-        self.tick()
-        pygame.draw.rect(SCREEN, self.colour, self.Rect())
+        self.rect.center = (round(self.x), round(self.y))
+        if not SCREEN.get_rect().contains(self.rect):
+            self.outTime += 1
+            if self.outTime > 100:
+                self.kill()
 
 ## init
 # pygame.init()
 
 pygame.display.set_caption("game")
 
-p1 = Player()
 
-objects = []
+p1 = pygame.sprite.GroupSingle()
+p1.add(Player())
+
+projectiles = pygame.sprite.Group()
 
 def populate(num):
     for _ in range(num):
-        objects.append(Projectile(random.randint(0, WIDTH), random.uniform(-.5, .5), 0, 1))
+        projectiles.add(Projectile(random.randint(0, WIDTH), 0, random.uniform(-.5, .5), 1))
 
 controls = {
-    pygame.K_w: p1.up,
-    pygame.K_s: p1.down,
-    pygame.K_a: p1.left,
-    pygame.K_d: p1.right
+    pygame.K_w: p1.sprite.up,
+    pygame.K_s: p1.sprite.down,
+    pygame.K_a: p1.sprite.left,
+    pygame.K_d: p1.sprite.right
 }
 
 
@@ -124,10 +128,16 @@ while not quit_flag:
 
 
     populate(1)
-    for obj in objects:
-        obj.draw()
-    print(len(objects))
-    p1.draw()
+
+
+    p1.update()
+    projectiles.update()
+
+    projectiles.draw(SCREEN)
+    p1.draw(SCREEN)
+
+
+    print(projectiles)
     # Update the display
     pygame.display.flip()
 
