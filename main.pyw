@@ -1,5 +1,5 @@
 import pygame
-
+import random
 
 ## config
 WIDTH = 800
@@ -11,6 +11,7 @@ FPS = 60
 # Colours
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+RED = (255, 0, 0)
 
 
 
@@ -21,11 +22,12 @@ CLOCK = pygame.time.Clock()
 class Player:
     def __init__(self):
         self.x = WIDTH/2
-        self.xVel = 0
+        self.xVel = 0.0
         self.y = HEIGHT/2
-        self.yVel = 0
-        self.width = 15
-        self.height = 15
+        self.yVel = 0.0
+        self.speed = 2.5
+        self.width = 25
+        self.height = 25
         self.colour = WHITE
     
 
@@ -37,20 +39,16 @@ class Player:
         return pygame.Rect(self.x, self.y, self.width, self.height)
 
     def up(self):
-        self.yVel -= 1
-        print("u")
+        self.yVel -= self.speed
     
     def down(self):
-        self.yVel += 1
-        print("d")
+        self.yVel += self.speed
     
     def left(self):
-        self.xVel -= 1
-        print("l")
+        self.xVel -= self.speed
     
     def right(self):
-        self.xVel += 1
-        print("r")
+        self.xVel += self.speed
     
 
 
@@ -63,6 +61,27 @@ class Player:
         self.yVel = 0
 
 
+class Projectile(pygame.sprite.Sprite):
+    def __init__(self, x, xVel, y, yVel):
+        self.x = x
+        self.xVel = xVel
+        self.y = y
+        self.yVel = yVel
+        self.speed = 2.5
+        self.width = 8
+        self.height = 8
+        self.colour = RED
+    
+    def tick(self):
+        self.x += self.xVel
+        self.y += self.yVel
+    
+    def Rect(self):
+        return pygame.Rect(self.x, self.y, self.width, self.height)
+    
+    def draw(self):
+        self.tick()
+        pygame.draw.rect(SCREEN, self.colour, self.Rect())
 
 ## init
 # pygame.init()
@@ -71,12 +90,17 @@ pygame.display.set_caption("game")
 
 p1 = Player()
 
+objects = []
+
+def populate(num):
+    for _ in range(num):
+        objects.append(Projectile(random.randint(0, WIDTH), random.uniform(-.5, .5), 0, 1))
 
 controls = {
-    pygame.K_UP: p1.up,
-    pygame.K_DOWN: p1.down,
-    pygame.K_LEFT: p1.left,
-    pygame.K_RIGHT: p1.right
+    pygame.K_w: p1.up,
+    pygame.K_s: p1.down,
+    pygame.K_a: p1.left,
+    pygame.K_d: p1.right
 }
 
 
@@ -92,15 +116,17 @@ while not quit_flag:
             quit_flag = True
 
     pressed = pygame.key.get_pressed() # CANT PRESS MULTIPLE KEYS ASDDSASDASF
-    # print(pressed)
-        # if k: print(k)
     for control in controls.keys():
-        
         if pressed[control]:
             controls.get(control)()
     # Clear the screen (fill with a solid color)
     SCREEN.fill(BLACK)  # Use RGB values for the color
 
+
+    populate(1)
+    for obj in objects:
+        obj.draw()
+    print(len(objects))
     p1.draw()
     # Update the display
     pygame.display.flip()
