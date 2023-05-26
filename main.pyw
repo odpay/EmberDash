@@ -7,6 +7,8 @@ WIDTH = 800
 HEIGHT = 600
 FPS = 60
 
+FREQ = 15
+
 ## Constants
 
 # Colours
@@ -16,7 +18,7 @@ RED = (255, 0, 0)
 
 
 
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
+SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), vsync=1)
 CLOCK = pygame.time.Clock()
 
 ## Classes
@@ -27,7 +29,7 @@ class Player(pygame.sprite.Sprite):
         self.xVel = 0.0
         self.y = HEIGHT/2
         self.yVel = 0.0
-        self.speed = 1.5
+        self.speed = 5
         self.width = 25
         self.height = 25
         self.colour = WHITE
@@ -39,7 +41,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self): # TODO: slow down diagonal movements, use sqrt
         self.x += self.xVel
-        self.xVel = 0
+        self.xVel = 0 # make self.speed 'max_speed', have an accel speed for smoother accel & decel <- maybe
         self.y += self.yVel
         self.yVel = 0
         self.rect.center = (round(self.x), round(self.y))
@@ -96,9 +98,14 @@ p1.add(Player())
 
 projectiles = pygame.sprite.Group()
 
+ticker = 0
 def populate(num):
-    for _ in range(num):
-        projectiles.add(Projectile(random.randint(0, WIDTH), 0, random.uniform(-.5, .5), 1))
+    global ticker
+    ticker += 1
+    if ticker >= FREQ:
+        for _ in range(num):
+            projectiles.add(Projectile(random.randint(0, WIDTH), 0, random.uniform(-.5, .5), 1))
+        ticker = 0
 
 controls = {
     pygame.K_w: p1.sprite.up,
