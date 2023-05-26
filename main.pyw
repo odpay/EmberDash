@@ -7,7 +7,7 @@ WIDTH = 800
 HEIGHT = 600
 FPS = 60
 
-FREQ = 15
+FREQ = 7
 
 ## Constants
 
@@ -15,7 +15,10 @@ FREQ = 15
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
+BLUE = (0, 0, 255)
 
+pygame.font.init()
+FONT = pygame.font.SysFont(None, 24)
 
 
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), vsync=1)
@@ -45,8 +48,14 @@ class Player(pygame.sprite.Sprite):
         self.y += self.yVel
         self.yVel = 0
         self.rect.center = (round(self.x), round(self.y))
+        if pygame.sprite.spritecollideany(self, projectiles):
+            self.kill()
+        else:
+            global score
+            score += 1
 
     def up(self):
+        
         self.yVel -= self.speed
     
     def down(self):
@@ -87,8 +96,11 @@ class Projectile(pygame.sprite.Sprite):
             if self.outTime > 100:
                 self.kill()
 
+
 ## init
 # pygame.init()
+
+score = 0
 
 pygame.display.set_caption("game")
 
@@ -143,6 +155,8 @@ while not quit_flag:
     projectiles.draw(SCREEN)
     p1.draw(SCREEN)
 
+    scoreCounter = FONT.render(f'{score}', True, BLUE)
+    SCREEN.blit(scoreCounter, (20, 20))
 
     print(projectiles)
     # Update the display
