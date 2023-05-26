@@ -1,12 +1,12 @@
 import pygame
 import random
 import math
+import json
 
 ## config
 WIDTH = 800
 HEIGHT = 600
 FPS = 60
-
 FREQ = 7
 
 ## Constants
