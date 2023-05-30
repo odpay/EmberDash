@@ -1,0 +1,13 @@
+
+(friendly) projectiles:
+    abilities:
+        - gungeon blank
+    buffs:
+        - + health or a shield
+    
+
+difficulty:
+    scaling:
+        - bullets get faster
+        - homing bullets?
+        - bigger bullets

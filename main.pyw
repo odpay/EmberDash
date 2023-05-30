@@ -33,8 +33,8 @@ class Player(pygame.sprite.Sprite):
         self.y = HEIGHT/2
         self.yVel = 0.0
         self.speed = 5
-        self.width = 25
-        self.height = 25
+        self.width = 20
+        self.height = 20
         self.colour = WHITE
     
         self.image = pygame.Surface((self.width, self.height))
@@ -43,11 +43,16 @@ class Player(pygame.sprite.Sprite):
         self.rect.center = (self.x, self.y)
 
     def update(self): # TODO: slow down diagonal movements, use sqrt
-        self.x += self.xVel
+        vec = pygame.math.Vector2(self.xVel, self.yVel)
+        if vec.x != 0 or vec.y != 0: vec.scale_to_length(self.speed)
+        self.x += vec.x
         self.xVel = 0 # make self.speed 'max_speed', have an accel speed for smoother accel & decel <- maybe
-        self.y += self.yVel
+        self.y += vec.y
         self.yVel = 0
         self.rect.center = (round(self.x), round(self.y))
+        self.rect.clamp_ip(SCREEN.get_rect())
+        self.x = self.rect.centerx
+        self.y = self.rect.centery
         if pygame.sprite.spritecollideany(self, projectiles):
             self.kill()
         else:
