@@ -105,69 +105,87 @@ class Projectile(pygame.sprite.Sprite):
 ## init
 # pygame.init()
 
-score = 0
+def init():
 
-pygame.display.set_caption("game")
+    global score, p1, projectiles, controls, ticker, populate, processInput
+    score = 0
+
+    pygame.display.set_caption("game")
 
 
-p1 = pygame.sprite.GroupSingle()
-p1.add(Player())
+    p1 = pygame.sprite.GroupSingle()
+    p1.add(Player())
 
-projectiles = pygame.sprite.Group()
+    projectiles = pygame.sprite.Group()
 
-ticker = 0
-def populate(num):
-    global ticker
-    ticker += 1
-    if ticker >= FREQ:
-        for _ in range(num):
-            projectiles.add(Projectile(random.randint(0, WIDTH), 0, random.uniform(-.5, .5), 1))
-        ticker = 0
+    ticker = 0
 
-controls = {
+    controls = {
     pygame.K_w: p1.sprite.up,
     pygame.K_s: p1.sprite.down,
     pygame.K_a: p1.sprite.left,
     pygame.K_d: p1.sprite.right
-}
+    }
+
+    
+    def populate(num):
+        global ticker
+        ticker += 1
+        if ticker >= FREQ:
+            for _ in range(num):
+                projectiles.add(Projectile(random.randint(0, WIDTH), 0, random.uniform(-.5, .5), 1))
+            ticker = 0
+
+    def processInput(controlMap):
+        pressed = pygame.key.get_pressed() # CANT PRESS MULTIPLE KEYS ASDDSASDASF
+        for control in controlMap.keys():
+            if pressed[control]:
+                controlMap.get(control)()
 
 
-def processInput(controlMap):
-    pressed = pygame.key.get_pressed() # CANT PRESS MULTIPLE KEYS ASDDSASDASF
-    for control in controlMap.keys():
-        if pressed[control]:
-            controlMap.get(control)()
 
 
-quit_flag = False
-while not quit_flag:
-    CLOCK.tick(FPS)
-    # Handle events
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+def main():
+
+    quit_flag = False
+    while not quit_flag:
+        CLOCK.tick(FPS)
+        # Handle events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit_flag = True
+                pygame.quit()
+                exit()
+
+
+        processInput(controls)
+        # Clear the screen (fill with a solid color)
+        SCREEN.fill(BLACK)  # Use RGB values for the color
+
+
+        populate(1)
+
+
+        p1.update()
+        projectiles.update()
+
+        if len(p1.sprites()) == 0:
             quit_flag = True
 
+        projectiles.draw(SCREEN)
+        p1.draw(SCREEN)
 
-    processInput(controls)
-    # Clear the screen (fill with a solid color)
-    SCREEN.fill(BLACK)  # Use RGB values for the color
+        scoreCounter = FONT.render(f'{score}', True, BLUE)
+        SCREEN.blit(scoreCounter, (20, 20))
 
-
-    populate(1)
-
-
-    p1.update()
-    projectiles.update()
-
-    projectiles.draw(SCREEN)
-    p1.draw(SCREEN)
-
-    scoreCounter = FONT.render(f'{score}', True, BLUE)
-    SCREEN.blit(scoreCounter, (20, 20))
-
-    print(projectiles)
-    # Update the display
-    pygame.display.flip()
+        # print(projectiles)
+        # Update the display
+        pygame.display.flip()
 
 
-pygame.quit()
+
+if __name__ == "__main__":
+    while True:
+        init()
+        main()
+    pygame.quit()
