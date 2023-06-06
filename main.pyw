@@ -110,7 +110,7 @@ def init():
     global score, p1, projectiles, controls, ticker, populate, processInput
     score = 0
 
-    pygame.display.set_caption("game")
+    pygame.display.set_caption("Ember Dash")
 
 
     p1 = pygame.sprite.GroupSingle()
