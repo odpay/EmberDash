@@ -132,7 +132,11 @@ controls = {
 }
 
 
-
+def processInput(controlMap):
+    pressed = pygame.key.get_pressed() # CANT PRESS MULTIPLE KEYS ASDDSASDASF
+    for control in controlMap.keys():
+        if pressed[control]:
+            controlMap.get(control)()
 
 
 quit_flag = False
@@ -143,10 +147,8 @@ while not quit_flag:
         if event.type == pygame.QUIT:
             quit_flag = True
 
-    pressed = pygame.key.get_pressed() # CANT PRESS MULTIPLE KEYS ASDDSASDASF
-    for control in controls.keys():
-        if pressed[control]:
-            controls.get(control)()
+
+    processInput(controls)
     # Clear the screen (fill with a solid color)
     SCREEN.fill(BLACK)  # Use RGB values for the color
 
