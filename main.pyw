@@ -1,13 +1,16 @@
 import pygame
 import random
-import math
 import json
 
 ## config
-WIDTH = 800
-HEIGHT = 600
-FPS = 60
-FREQ = 7
+with open("./cfg/config.json", 'r') as cfgFile:
+    cfg = json.loads(cfgFile.read())
+    cfgFile.close()
+
+WIDTH = cfg["WIDTH"]
+HEIGHT = cfg["HEIGHT"]
+FPS = cfg["FPS"]
+FREQ = cfg["FREQ"]
 
 ## Constants
 
@@ -16,6 +19,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
+GREEN = (0, 255, 0)
 
 pygame.font.init()
 FONT = pygame.font.SysFont(None, 24)
@@ -41,8 +45,9 @@ class Player(pygame.sprite.Sprite):
         self.image.fill(self.colour)
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
+        self.scoreCooldown = 0
 
-    def update(self): # TODO: slow down diagonal movements, use sqrt
+    def update(self): 
         vec = pygame.math.Vector2(self.xVel, self.yVel)
         if vec.x != 0 or vec.y != 0: vec.scale_to_length(self.speed)
         self.x += vec.x
@@ -56,8 +61,11 @@ class Player(pygame.sprite.Sprite):
         if pygame.sprite.spritecollideany(self, projectiles):
             self.kill()
         else:
-            global score
-            score += 1
+            self.scoreCooldown += 1
+            if self.scoreCooldown >= 3:
+                global score
+                score += 1
+                self.scoreCooldown = 0
 
     def up(self):
         
@@ -104,10 +112,21 @@ class Projectile(pygame.sprite.Sprite):
 
 ## init
 # pygame.init()
+def syncHS(s=0):
+    with open("./cfg/hs.txt", 'r+') as hsF:
+        hs = int(hsF.read())
+        if s > hs:
+            hs = s
+            hsF.seek(0)
+            hsF.write(str(s))
+            hsF.truncate()
+        hsF.close()
+    return hs
+
 
 def init():
 
-    global score, p1, projectiles, controls, ticker, populate, processInput
+    global score, p1, projectiles, controls, ticker, populate, processInput, HISCORE
     score = 0
 
     pygame.display.set_caption("Ember Dash")
@@ -126,7 +145,6 @@ def init():
     pygame.K_a: p1.sprite.left,
     pygame.K_d: p1.sprite.right
     }
-
     
     def populate(num):
         global ticker
@@ -146,6 +164,7 @@ def init():
 
 
 def main():
+    HISCORE = syncHS()
 
     quit_flag = False
     while not quit_flag:
@@ -169,18 +188,23 @@ def main():
         p1.update()
         projectiles.update()
 
+        if score > HISCORE: HISCORE = score
+
         if len(p1.sprites()) == 0:
             quit_flag = True
 
         projectiles.draw(SCREEN)
         p1.draw(SCREEN)
 
-        scoreCounter = FONT.render(f'{score}', True, BLUE)
-        SCREEN.blit(scoreCounter, (20, 20))
+        scoreCounter = FONT.render(f'Score: {score}', True, BLUE)
+        hScoreCounter = FONT.render(f'HI-Score: {str(HISCORE)}', True, GREEN)
+        SCREEN.blit(scoreCounter, (20, 30))
+        SCREEN.blit(hScoreCounter, (19, 10))
 
         # print(projectiles)
         # Update the display
         pygame.display.flip()
+    syncHS(score)
 
 
 
@@ -188,4 +212,3 @@ if __name__ == "__main__":
     while True:
         init()
         main()
-    pygame.quit()
