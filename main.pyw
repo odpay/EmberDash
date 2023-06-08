@@ -41,8 +41,10 @@ class Player(pygame.sprite.Sprite):
         self.height = 20
         self.colour = WHITE
     
-        self.image = pygame.Surface((self.width, self.height))
-        self.image.fill(self.colour)
+        # self.image = pygame.Surface((self.width, self.height))
+        # self.image.fill(self.colour)
+        self.image =pygame.image.load("assets/sprites/wispy/Wispy1.png")
+        self.image = pygame.transform.scale(self.image, (self.width*2, self.height*2))
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
         self.scoreCooldown = 0
