@@ -1,6 +1,7 @@
 import pygame
 import random
 import json
+import math
 
 ## config
 with open("./cfg/config.json", 'r') as cfgFile:
@@ -40,27 +41,34 @@ class Player(pygame.sprite.Sprite):
         self.width = 20
         self.height = 20
         self.colour = WHITE
+        self.flipped = False
     
         # self.image = pygame.Surface((self.width, self.height))
         # self.image.fill(self.colour)
-        self.image =pygame.image.load("assets/sprites/wispy/Wispy1.png")
+        self.image = pygame.image.load("assets/sprites/wispy/Wispy1.png")
         self.image = pygame.transform.scale(self.image, (self.width*2, self.height*2))
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
+        self.mask = pygame.mask.from_surface(self.image)
+        # self.image = self.mask.to_surface()
         self.scoreCooldown = 0
 
     def update(self): 
         vec = pygame.math.Vector2(self.xVel, self.yVel)
         if vec.x != 0 or vec.y != 0: vec.scale_to_length(self.speed)
         self.x += vec.x
-        self.xVel = 0 # make self.speed 'max_speed', have an accel speed for smoother accel & decel <- maybe
         self.y += vec.y
-        self.yVel = 0
         self.rect.center = (round(self.x), round(self.y))
         self.rect.clamp_ip(SCREEN.get_rect())
         self.x = self.rect.centerx
         self.y = self.rect.centery
-        if pygame.sprite.spritecollideany(self, projectiles):
+        # angle = vec.as_polar()[1]
+        self.face()
+        self.xVel = 0 # make self.speed 'max_speed', have an accel speed for smoother accel & decel <- maybe
+        self.yVel = 0
+        # if pygame.sprite.groupcollide(p1, projectiles, True, False):
+        #     self.kill()
+        if pygame.sprite.spritecollideany(self, projectiles, pygame.sprite.collide_mask):
             self.kill()
         else:
             self.scoreCooldown += 1
@@ -69,6 +77,15 @@ class Player(pygame.sprite.Sprite):
                 score += 1
                 self.scoreCooldown = 0
 
+    def face(self):
+        if self.flipped and self.xVel > 0:
+            self.image = pygame.transform.flip(self.image, True, False)
+            self.mask = pygame.mask.from_surface(self.image)
+            self.flipped = False
+        if not self.flipped and self.xVel < 0:
+            self.image = pygame.transform.flip(self.image, True, False)
+            self.mask = pygame.mask.from_surface(self.image)
+            self.flipped = True
     def up(self):
         
         self.yVel -= self.speed
@@ -95,7 +112,7 @@ class Projectile(pygame.sprite.Sprite):
         self.speed = 2.5
         self.width = 8
         self.height = 8
-        self.colour = RED
+        self.colour = WHITE
         self.image = pygame.Surface((self.width, self.height))
         self.image.fill(self.colour)
         self.rect = self.image.get_rect()
