@@ -11,7 +11,8 @@ with open("./cfg/config.json", 'r') as cfgFile:
 WIDTH = cfg["WIDTH"]
 HEIGHT = cfg["HEIGHT"]
 FPS = cfg["FPS"]
-FREQ = cfg["FREQ"]
+START_FREQ = cfg["START_FREQ"]
+END_FREQ = cfg["END_FREQ"]
 
 ## Constants
 
@@ -42,7 +43,6 @@ class Player(pygame.sprite.Sprite):
         self.height = 20
         self.colour = WHITE
         self.flipped = False
-    
         # self.image = pygame.Surface((self.width, self.height))
         # self.image.fill(self.colour)
         self.image = pygame.image.load("assets/sprites/wispy/Wispy1.png")
@@ -80,12 +80,11 @@ class Player(pygame.sprite.Sprite):
     def face(self):
         if self.flipped and self.xVel > 0:
             self.image = pygame.transform.flip(self.image, True, False)
-            self.mask = pygame.mask.from_surface(self.image)
             self.flipped = False
         if not self.flipped and self.xVel < 0:
             self.image = pygame.transform.flip(self.image, True, False)
-            self.mask = pygame.mask.from_surface(self.image)
             self.flipped = True
+        self.mask = pygame.mask.from_surface(self.image)
     def up(self):
         
         self.yVel -= self.speed
@@ -110,13 +109,16 @@ class Projectile(pygame.sprite.Sprite):
         self.y = y
         self.yVel = yVel
         self.speed = 2.5
-        self.width = 8
-        self.height = 8
+        self.width = 150
+        self.height = 150
         self.colour = WHITE
-        self.image = pygame.Surface((self.width, self.height))
-        self.image.fill(self.colour)
+        # self.image = pygame.Surface((self.width, self.height))
+        # self.image.fill(self.colour)
+        self.image = pygame.image.load("assets/sprites/snow/snow.png")
+        self.image = pygame.transform.scale(self.image, (self.width/8, self.height/8))
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
+        self.mask = pygame.mask.from_surface(self.image)
         self.outTime = 0
 
     def update(self):
@@ -145,7 +147,7 @@ def syncHS(s=0):
 
 def init():
 
-    global score, p1, projectiles, controls, ticker, populate, processInput, HISCORE
+    global score, p1, projectiles, controls, ticker, populate, processInput, HISCORE, clamp
     score = 0
 
     pygame.display.set_caption("Ember Dash")
@@ -165,7 +167,7 @@ def init():
     pygame.K_d: p1.sprite.right
     }
     
-    def populate(num):
+    def populate(num, FREQ):
         global ticker
         ticker += 1
         if ticker >= FREQ:
@@ -178,6 +180,8 @@ def init():
         for control in controlMap.keys():
             if pressed[control]:
                 controlMap.get(control)()
+    def clamp(minimum, x, maximum):
+        return max(minimum, min(x, maximum))
 
 
 
@@ -201,7 +205,8 @@ def main():
         SCREEN.fill(BLACK)  # Use RGB values for the color
 
 
-        populate(1)
+        populate(1, clamp(END_FREQ, START_FREQ-(int(score/150)), START_FREQ))
+        print(clamp(END_FREQ, START_FREQ-(int(score/150)), START_FREQ))
 
 
         p1.update()
