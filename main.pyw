@@ -143,15 +143,16 @@ def syncHS(s=0):
         hsF.close()
     return hs
 
-testc = 0
+# testc = 0
 def init():
 
-    global score, p1, projectiles, controls, ticker, populate, processInput, HISCORE, clamp, testc, testCase
+    global score, p1, projectiles, controls, ticker, populate, processInput, HISCORE, clamp
+    # global testc, testCase
 
-    def testCase(s, hs): # Input set: (200, 400, 600, 400, 200, 800)
-        global testc
-        testc += 1
-        print(f"Test Case (#{str(testc)}): Input score: {str(s)}, Output HI-SCORE: {str(hs)}")
+    # def testCase(s, hs): # Input set: (200, 400, 600, 400, 200, 800)
+    #     global testc
+    #     testc += 1
+    #     print(f"Test Case (#{str(testc)}): Input score: {str(s)}, Output HI-SCORE: {str(hs)}")
     score = 0
 
     pygame.display.set_caption("Ember Dash")
@@ -196,7 +197,6 @@ def init():
 
 def main():
     HISCORE = syncHS()
-    # testCase(score, HISCORE)
 
     quit_flag = False
     while not quit_flag:
@@ -238,7 +238,7 @@ def main():
         # Update the display
         pygame.display.flip()
     HISCORE = syncHS(score)
-    testCase(score, HISCORE)
+    # testCase(score, HISCORE)
 
 
 
