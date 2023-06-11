@@ -40,7 +40,7 @@ class Player(pygame.sprite.Sprite):
         self.speed = 5
         self.width = 20
         self.height = 20
-        self.colour = WHITE
+        # self.colour = WHITE
         self.flipped = False
         # self.image = pygame.Surface((self.width, self.height))
         # self.image.fill(self.colour)
@@ -107,10 +107,10 @@ class Projectile(pygame.sprite.Sprite):
         self.xVel = xVel
         self.y = y
         self.yVel = yVel
-        self.speed = 2.5
+        # self.speed = 2.5
         self.width = 150
         self.height = 150
-        self.colour = WHITE
+        # self.colour = WHITE
         # self.image = pygame.Surface((self.width, self.height))
         # self.image.fill(self.colour)
         self.image = pygame.image.load("assets/sprites/snow/snow.png")
@@ -146,7 +146,7 @@ def syncHS(s=0):
 # testc = 0
 def init():
 
-    global score, p1, projectiles, controls, ticker, populate, processInput, HISCORE, clamp
+    global score, p1, projectiles, controls, ticker, populate, processInput, clamp
     # global testc, testCase
 
     # def testCase(s, hs): # Input set: (200, 400, 600, 400, 200, 800)
