@@ -1,7 +1,6 @@
 import pygame
 import random
 import json
-import math
 
 ## config
 with open("./cfg/config.json", 'r') as cfgFile:
@@ -144,10 +143,15 @@ def syncHS(s=0):
         hsF.close()
     return hs
 
-
+testc = 0
 def init():
 
-    global score, p1, projectiles, controls, ticker, populate, processInput, HISCORE, clamp
+    global score, p1, projectiles, controls, ticker, populate, processInput, HISCORE, clamp, testc, testCase
+
+    def testCase(s, hs): # Input set: (200, 400, 600, 400, 200, 800)
+        global testc
+        testc += 1
+        print(f"Test Case (#{str(testc)}): Input score: {str(s)}, Output HI-SCORE: {str(hs)}")
     score = 0
 
     pygame.display.set_caption("Ember Dash")
@@ -192,6 +196,7 @@ def init():
 
 def main():
     HISCORE = syncHS()
+    # testCase(score, HISCORE)
 
     quit_flag = False
     while not quit_flag:
@@ -210,7 +215,7 @@ def main():
 
 
         populate(1, clamp(END_FREQ, START_FREQ-(int(score/150)), START_FREQ))
-        print(clamp(END_FREQ, START_FREQ-(int(score/150)), START_FREQ))
+        # print(clamp(END_FREQ, START_FREQ-(int(score/150)), START_FREQ))
 
 
         p1.update()
@@ -232,7 +237,8 @@ def main():
         # print(projectiles)
         # Update the display
         pygame.display.flip()
-    syncHS(score)
+    HISCORE = syncHS(score)
+    testCase(score, HISCORE)
 
 
 
