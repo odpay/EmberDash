@@ -164,7 +164,11 @@ def init():
     pygame.K_w: p1.sprite.up,
     pygame.K_s: p1.sprite.down,
     pygame.K_a: p1.sprite.left,
-    pygame.K_d: p1.sprite.right
+    pygame.K_d: p1.sprite.right,
+    pygame.K_UP: p1.sprite.up,
+    pygame.K_DOWN: p1.sprite.down,
+    pygame.K_LEFT: p1.sprite.left,
+    pygame.K_RIGHT: p1.sprite.right
     }
     
     def populate(num, FREQ):
