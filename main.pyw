@@ -1,6 +1,7 @@
 import pygame
 import random
 import json
+import os.path
 
 ## config
 with open("./cfg/config.json", 'r') as cfgFile:
@@ -146,6 +147,13 @@ class Projectile(pygame.sprite.Sprite):
 # like it just wastes 4 seconds each launch
 
 def syncHS(s=0): # Sync HI-SCORE with file
+
+    # First time run
+    if not os.path.isfile("./cfg/hs.txt"):
+        with open("./cfg/hs.txt", 'w') as tempF:
+            tempF.write("0")
+            tempF.close()
+    
     with open("./cfg/hs.txt", 'r+') as hsF:
         hs = int(hsF.read())
         if s > hs:
