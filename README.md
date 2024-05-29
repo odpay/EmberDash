@@ -7,6 +7,9 @@ bullet hell pygame school project i made in 2023
 ```bash
 pip3 install pygame
 ```
+```bash
+python3 ./main.pyw
+```
 
 ## Assets used
 - [Player sprite (Wispy)](https://ramenphysics22.itch.io/fire-wisp)
